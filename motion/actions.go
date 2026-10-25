@@ -3,7 +3,7 @@
 // other action.
 package motion
 
-import "vimkit/keys"
+import "github.com/Gandalfalex/vim-kit/keys"
 
 // Vertical motions, for lists (Window) and pagers (Pager).
 const (

@@ -18,11 +18,6 @@ type Input struct {
 	pending string
 }
 
-// Feed consumes one key against km. It returns the completed Event and true,
-// or false while a count or sequence is still being typed.
-//
-// A digit starts a count unless it is bound on its own (like "1" switching
-// tabs); "0" without a count is always a plain key, as in vim.
 func (in *Input) Feed(km *Keymap, k string) (Event, bool) {
 	if in.pending == "" && !in.NoCount && isDigit(k) && (in.count != "" || (k != "0" && !in.bound(km, k))) {
 		if len(in.count) < 6 {

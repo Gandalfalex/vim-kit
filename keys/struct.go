@@ -5,10 +5,6 @@ import (
 	"strings"
 )
 
-// FromStruct builds Bindings from a config struct (or pointer to one) whose
-// []string fields hold keys, naming each action after the field's tag
-// (e.g. `yaml:"next_result"`), or the field name without one. Nested
-// structs are flattened. This lets apps keep their own config layout.
 func FromStruct(v any, tag string) Bindings {
 	b := Bindings{}
 	collect(reflect.Indirect(reflect.ValueOf(v)), tag, b)

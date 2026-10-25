@@ -4,7 +4,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"vimkit/keys"
+	"github.com/Gandalfalex/vim-kit/keys"
 )
 
 // ApplyText runs ev's in-line motion from column col (in runes) of line and

@@ -1,6 +1,6 @@
 package motion
 
-import "vimkit/keys"
+import "github.com/Gandalfalex/vim-kit/keys"
 
 // Pager is a scrollable text view without a cursor, e.g. a bubbles viewport
 // behind a small adapter.

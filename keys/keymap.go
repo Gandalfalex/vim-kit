@@ -9,17 +9,10 @@ import (
 	"unicode/utf8"
 )
 
-// Action names something a key does, e.g. "down" or "yank". Using strings
-// lets bindings come straight from a config file.
 type Action string
 
-// Bindings assigns keys to actions. Key names follow bubbletea's
-// KeyMsg.String() ("j", "ctrl+d", "enter", "up"). A string of several
-// single-character keys without "+" that is not a named key is a sequence:
-// "gg", "zz", "gi".
 type Bindings map[Action][]string
 
-// Clone returns a deep copy, safe to modify.
 func (b Bindings) Clone() Bindings {
 	c := make(Bindings, len(b))
 	for a, ks := range b {
@@ -28,17 +21,11 @@ func (b Bindings) Clone() Bindings {
 	return c
 }
 
-// Keymap is a validated, immutable lookup from key sequence to action.
 type Keymap struct {
 	actions  map[string]Action
 	prefixes map[string]bool
 }
 
-// NewKeymap merges layers, later layers replacing an action's keys entirely
-// (so a config file can rebind or, with an empty list, unbind an action).
-// It fails when a key is bound to two actions, or is bound on its own while
-// also starting a sequence ("g" and "gg"): with no timeout, the sequence
-// could never be typed.
 func NewKeymap(layers ...Bindings) (*Keymap, error) {
 	merged := Bindings{}
 	for _, l := range layers {

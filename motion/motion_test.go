@@ -3,7 +3,7 @@ package motion
 import (
 	"testing"
 
-	"vimkit/keys"
+	"github.com/Gandalfalex/vim-kit/keys"
 )
 
 func ev(a keys.Action, count ...int) keys.Event {

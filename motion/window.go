@@ -1,6 +1,6 @@
 package motion
 
-import "vimkit/keys"
+import "github.com/Gandalfalex/vim-kit/keys"
 
 // Window is a cursor over n rows shown h rows at a time, starting at Top.
 type Window struct {
