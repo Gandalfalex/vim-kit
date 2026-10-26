@@ -1,3 +1,3 @@
-module github.com/Gandalfalex/vim-kit/vim-kit
+module github.com/Gandalfalex/vim-kit
 
 go 1.24
