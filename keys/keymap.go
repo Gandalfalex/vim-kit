@@ -37,6 +37,7 @@ func NewKeymap(layers ...Bindings) (*Keymap, error) {
 	var errs []string
 	for _, a := range sortedActions(merged) {
 		for _, k := range merged[a] {
+			k = Normalize(k)
 			if k == "" {
 				continue
 			}
@@ -99,6 +100,55 @@ var named = map[string]bool{
 	"up": true, "down": true, "left": true, "right": true, "enter": true, "esc": true,
 	"tab": true, "space": true, "backspace": true, "delete": true, "insert": true,
 	"home": true, "end": true, "pgup": true, "pgdown": true,
+}
+
+// aliases are other spellings of key names, e.g. from hand-written configs
+// or older terminal libraries.
+var aliases = map[string]string{
+	"escape": "esc", "return": "enter", "spacebar": "space",
+	"pageup": "pgup", "pagedown": "pgdown", "del": "delete", "ins": "insert",
+}
+
+// Normalize returns the canonical spelling of a binding as written by a
+// user: " " becomes "space", "Escape" becomes "esc" and "Ctrl+D" becomes
+// "ctrl+d". Plain keys and sequences such as "G" or "gg" are case-sensitive
+// and kept as is.
+func Normalize(k string) string {
+	if k == " " {
+		return "space"
+	}
+	if utf8.RuneCountInString(k) < 2 {
+		return k
+	}
+	// With modifiers everything is lower case, as terminals report it
+	// (ctrl+d, never ctrl+D); a bare key keeps its case unless it is a
+	// named key.
+	mods, key := "", k
+	if i := strings.LastIndex(k[:len(k)-1], "+"); i >= 0 {
+		mods, key = strings.ToLower(k[:i+1]), k[i+1:]
+	}
+	lower := strings.ToLower(key)
+	if a, ok := aliases[lower]; ok {
+		lower = a
+	}
+	if key == " " {
+		lower = "space"
+	}
+	if mods != "" || named[lower] || isFKey(lower) {
+		key = lower
+	}
+	return mods + key
+}
+
+// Normalize returns b with every key in its canonical spelling.
+func (b Bindings) Normalize() Bindings {
+	c := make(Bindings, len(b))
+	for a, ks := range b {
+		for _, k := range ks {
+			c[a] = append(c[a], Normalize(k))
+		}
+	}
+	return c
 }
 
 // Split breaks a binding into its keys: "gg" → [g g], "ctrl+d" → [ctrl+d].

@@ -20,6 +20,20 @@ func (w *Window) Move(d, n int) {
 	w.Clamp(n)
 }
 
+// Select puts the cursor on the first of n rows for which match reports
+// true, e.g. to stay on the same item after a list was reloaded or resorted.
+// Without a match the cursor is only clamped.
+func (w *Window) Select(n int, match func(i int) bool) bool {
+	for i := range n {
+		if match(i) {
+			w.Cursor = i
+			return true
+		}
+	}
+	w.Clamp(n)
+	return false
+}
+
 // Scroll adjusts Top so the cursor stays visible with a small scrolloff.
 func (w *Window) Scroll(n, h int) {
 	if h <= 0 {

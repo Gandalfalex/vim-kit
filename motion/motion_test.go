@@ -139,3 +139,15 @@ func TestText(t *testing.T) {
 		t.Error("ClampCol")
 	}
 }
+
+func TestWindowSelect(t *testing.T) {
+	items := []string{"a", "b", "c"}
+	w := Window{Cursor: 2}
+	if !w.Select(len(items), func(i int) bool { return items[i] == "b" }) || w.Cursor != 1 {
+		t.Errorf("select b: cursor %d", w.Cursor)
+	}
+	w.Cursor = 7 // list shrank and the item is gone
+	if w.Select(len(items), func(i int) bool { return items[i] == "x" }) || w.Cursor != 2 {
+		t.Errorf("select missing: cursor %d", w.Cursor)
+	}
+}

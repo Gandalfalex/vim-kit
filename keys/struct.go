@@ -49,3 +49,28 @@ func (b Bindings) Only(actions ...Action) Bindings {
 	}
 	return o
 }
+
+// NormalizeStruct rewrites every key in the []string fields of the struct v
+// points to (nested structs included) to its canonical spelling. Call it on
+// a config struct after loading, when the app also reads the fields directly.
+func NormalizeStruct(v any) {
+	normalize(reflect.Indirect(reflect.ValueOf(v)))
+}
+
+func normalize(v reflect.Value) {
+	if v.Kind() != reflect.Struct {
+		return
+	}
+	for i := range v.NumField() {
+		fv := v.Field(i)
+		switch {
+		case !fv.CanSet():
+		case fv.Kind() == reflect.Struct:
+			normalize(fv)
+		case fv.Type() == reflect.TypeOf([]string(nil)):
+			for j := range fv.Len() {
+				fv.Index(j).SetString(Normalize(fv.Index(j).String()))
+			}
+		}
+	}
+}

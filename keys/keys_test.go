@@ -129,3 +129,33 @@ func TestFromStruct(t *testing.T) {
 		t.Errorf("Only: %v", o)
 	}
 }
+
+func TestNormalize(t *testing.T) {
+	cases := map[string]string{
+		" ": "space", "space": "space", "Escape": "esc", "Return": "enter", "PageDown": "pgdown",
+		"Ctrl+D": "ctrl+d", "ctrl+ ": "ctrl+space", "Alt+Enter": "alt+enter", "shift+Tab": "shift+tab",
+		"F5": "f5", "gg": "gg", "G": "G", "gi": "gi", "ZZ": "ZZ", "+": "+", "ctrl++": "ctrl++", "": "",
+	}
+	for in, want := range cases {
+		if got := Normalize(in); got != want {
+			t.Errorf("Normalize(%q) = %q, want %q", in, got, want)
+		}
+	}
+
+	// Keymaps accept any spelling; struct fields are rewritten in place.
+	km := MustKeymap(Bindings{"toggle": {" ", "Enter"}})
+	for _, k := range []string{"space", "enter"} {
+		if a, _ := km.Lookup(k); a != "toggle" {
+			t.Errorf("%q not bound after normalizing", k)
+		}
+	}
+	cfg := struct {
+		Nav  struct{ Toggle []string }
+		Quit []string
+	}{Quit: []string{"Ctrl+C"}}
+	cfg.Nav.Toggle = []string{" "}
+	NormalizeStruct(&cfg)
+	if cfg.Nav.Toggle[0] != "space" || cfg.Quit[0] != "ctrl+c" {
+		t.Errorf("NormalizeStruct: %+v", cfg)
+	}
+}
