@@ -25,10 +25,7 @@ func (w *Window) Scroll(n, h int) {
 	if h <= 0 {
 		return
 	}
-	off := 2
-	if h < 7 {
-		off = 0
-	}
+	off := scrolloff(h)
 	if w.Cursor < w.Top+off {
 		w.Top = w.Cursor - off
 	}
@@ -37,6 +34,14 @@ func (w *Window) Scroll(n, h int) {
 	}
 	w.Top = min(w.Top, n-h)
 	w.Top = max(w.Top, 0)
+}
+
+// scrolloff is the number of rows kept visible above and below the cursor.
+func scrolloff(h int) int {
+	if h < 7 {
+		return 0
+	}
+	return 2
 }
 
 // Center puts the cursor in the middle of the view (zz).
@@ -77,13 +82,21 @@ func (w *Window) Apply(ev keys.Event, n, h int) bool {
 		w.Cursor = lineOr(ev, n-1)
 		w.Clamp(n)
 	case ScreenTop:
+		// Like vim, H and L stop scrolloff rows short of the edge, so the
+		// Scroll that follows does not move the view.
 		w.Cursor = w.Top
+		if w.Top > 0 {
+			w.Cursor += scrolloff(h)
+		}
 		w.Clamp(n)
 	case ScreenMiddle:
 		w.Cursor = w.Top + min(h, n-w.Top)/2
 		w.Clamp(n)
 	case ScreenBottom:
 		w.Cursor = w.Top + min(h, n-w.Top) - 1
+		if w.Cursor < n-1 {
+			w.Cursor -= scrolloff(h)
+		}
 		w.Clamp(n)
 	case Center:
 		w.Center(n, h)

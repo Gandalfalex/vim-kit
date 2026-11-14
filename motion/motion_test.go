@@ -33,9 +33,11 @@ func TestWindow(t *testing.T) {
 		{Window{}, ev(Bottom, 42), 41},
 		{Window{Cursor: 50}, ev(Top), 0},
 		{Window{Cursor: 50}, ev(Top, 7), 6},
-		{Window{Cursor: 50, Top: 40}, ev(ScreenTop), 40},
+		{Window{Cursor: 50, Top: 40}, ev(ScreenTop), 42}, // scrolloff
+		{Window{Cursor: 5, Top: 0}, ev(ScreenTop), 0},
+		{Window{Cursor: 85, Top: 80}, ev(ScreenBottom), 99},
 		{Window{Cursor: 50, Top: 40}, ev(ScreenMiddle), 50},
-		{Window{Cursor: 50, Top: 40}, ev(ScreenBottom), 59},
+		{Window{Cursor: 50, Top: 40}, ev(ScreenBottom), 57},
 		{Window{Cursor: 95}, ev(Down, 10), 99},
 		{Window{Cursor: 0, Top: 0}, ev(ScrollDown, 5), 5},
 	}

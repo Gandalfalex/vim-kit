@@ -7,4 +7,6 @@
 //   - motion: list/pager motions (j, ctrl+d, G, H/M/L, zz, ...) and in-line
 //     text motions (h, l, w, b, e, 0, $).
 //   - visual: line and character selections and the text they cover.
+//   - cmdline: ":" ex-commands with aliases, unique-prefix lookup, completion
+//     and history; the app brings its own text input.
 package vimkit
